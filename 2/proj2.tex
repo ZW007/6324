@@ -1,0 +1,114 @@
+\documentclass[11pt]{article}
+\usepackage{fullpage}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{alltt}
+\usepackage{url}
+
+\begin{document}
+
+\thispagestyle{empty}
+
+\noindent \textbf{CS 6324: Information Security\hspace*{\fill}Spring 2021}
+\begin{center}
+{\LARGE Project \#2 - Software Security}
+\end{center}
+
+In this project, you will perform a series of software vulnerability exploits. You will explore unsafe and insecure programming techniques and will evaluate the efficacy of operating system defenses against them.
+
+\section*{Instructions}
+
+\paragraph{Due date \& time} 11:59pm CST on April 16, 2021.
+Submit your report to eLearning by the due time.
+
+\begin{itemize}
+	\item For these questions, you will need to access a virtual machine that is set up on\\
+    \verb"edgar.utdallas.edu". Each student will use their account on \verb"edgar.utdallas.edu". You will receive an email with this information.
+    \item Use the UT Dallas VPN if you connect to the server from outside the campus: \url{https://oit.utdallas.edu/howto/vpn/}.
+    \item After logging into \verb"edgar", you can access the virtual machine via ssh:\\ \verb"ssh attackme". The username/password will be the same as that of \verb"edgar.utdallas.edu".
+	\item The source files you need can be found in your home directory. The targets will be in a tar archive in the directory \verb"~/targets/". 
+	\item The source code of your answers needs to be in the directory \verb"~/exploits/" by the deadline. You need to hardcode relative paths in your source code to execute the targets.
+	\item Any code you write should run in the virtual machine in \verb"edgar" with no errors.
+	\item The written portion of the project must be typed. Using Latex is recommended, but not required. The submitted document must be a PDF (no doc or docx are allowed).
+	\item Most of the points for each question will be for a correct exploit. If you answer a question without correctly exploiting the target, no credit will be given.
+	\item \textbf{When writing an exploit in C, you should use a function like $execve$ to launch the target, not a function like system.  Passing in $null$ for the environmental variables so that it will be consistent and repeatable from run to run.}
+	\item You are \textbf{NOT} allowed to modify the source code for any of the targets.
+    \item To compile the source code you can run \verb"make" within the target directory. You can create a similar make file in the exploit directory or compile them individually using gcc.
+    \item If you want to use extra days in this project, please notify TA (dongpeng.liu@utdallas.edu) by the due time. Otherwise, your account on \verb"edgar" will be locked and you will not be able to modify your code.
+
+
+\end{itemize}
+
+
+
+\section{(20 pts) Simple Command Line Buffer Overflow}
+
+\verb"target1" is a program that takes a directory as input, and tells the user how to use the command \verb"ls" to list the contents of the directory. Suppose that this program is setuid root. You will login as a normal user, and your goal is to pass an argument to the program so it will start a root shell.
+	
+	\begin{itemize}
+		\item In the exploits directory, write a shell script \verb"exploit1.sh" that passes the attack string to the target and performs the attack.
+		\item Identify the exact vulnerability in the program that you exploited (i.e. function name and line number)
+		\item Explain your attack strategy. That is, explain how you determined the correct input to pass and what commands are executed.
+	\end{itemize}
+	
+\section{(20 pts) Buffer Overflow To Rewrite a Return}
+\label{sec:buffer_overflow}
+
+\begin{enumerate}
+	\item \textbf{The attack}: \verb"target2" is a program that takes a customer's name as the input, and prints a coupon.  Assume that each customer can only execute the program once, so he/she can only get one coupon.  Your goal is to pass some argument to the program so it will repeatedly print coupons.  In other words, the argument will make the program execute the function {\em coupon} repeatedly.
+	Note: To get full credit, the function \verb"coupon" has to execute an \emph{infinite} number of times. If it only executes twice, then you will get half the points.
+	
+	\begin{itemize}
+		\item In the exploits directory, write a C program \verb"exploit2.c" that passes the attack string to the target and performs the attack.
+		\item Identify the specific bug/vulnerability that made your attack possible.
+		\item Describe your attack strategy. That is, describe the memory addresses involved in your attack, and explain how the attack made the program print an unlimited number of coupons.
+	\end{itemize}
+	
+	\item \textbf{The defense}: The machine \verb"edgar" has an updated operating system with some stack defenses activated.
+	\begin{itemize}
+		\item Repeat the attack on \verb"target2" outside the virtual machine. Did the attack work? Comment on your results (i.e. explain why)
+		\item Propose \textbf{two} different operating system and/or compiler/programming language defenses that can be used to prevent this attack from working. Discuss the advantages, disadvantages, and feasibility of the proposed defenses.
+	\end{itemize}
+	
+\end{enumerate}
+
+\section{(20 pts) Return to libc}
+
+\begin{enumerate}
+	\item \textbf{The attack}: \verb"target3" is a program that scans several network packets and checks if the traffic (concatenation of the packets) matches any virus signatures. Suppose \verb"target3" is setuid root. You will login as a normal user, and the goal is to pass argument(s) to the program to start a root shell. You need to assume that the stack is \textbf{not} executable. Therefore, you \textbf{cannot} change the return address to the shellcode in the stack.
+	
+	\begin{itemize}
+		\item Draw the layout of the stack frame corresponding to the function \verb"is_virus" directly after the local variables are initialized. For each element on the stack, provide its size (assuming a 32-bit architecture).
+		\item In the exploits directory, write a C program \verb"exploit3.c" that performs the attack.
+		\item Identify the specific bug in the program and vulnerability in the operating system that made your attack possible.
+		\item Describe your attack strategy. That is, explain what memory addresses you used and how you figured out those addresses.
+	\end{itemize}
+	
+	\item \textbf{The defense}: Try repeating the above attack on \verb"edgar" (outside the virtual machine). The attack should become more difficult now.
+	\begin{itemize}
+		\item Are you able to get the attack to work? If so, explain your method. Otherwise, explain what prevented you from completing the attack.
+		\item What specific mechanism(s) make the attack more difficult?
+	\end{itemize}
+\end{enumerate}
+
+\section{(40 pts) Format String Attacks}
+
+In this section, you are given a program with a format-string vulnerability; your task is to develop a scheme to exploit the vulnerability. You can find the source code for the program \verb"target4.c".
+
+In \verb"target4.c", you will be asked to provide an input, which will be saved in a buffer called {\tt user\_input}. The program then prints out the buffer using {\tt printf}. Unfortunately, there is a format-string vulnerability in the way the {\tt printf} is called on the user inputs. We want to exploit this vulnerability and see how much damage we can achieve.
+
+The program has two secret values stored in its memory, and you are interested in these secret values. However, the secret values are unknown to you, nor can you find them from reading the  binary code (for the sake of simplicity, we hardcode the secrets  using constants 0x$44$ and 0x$55$, but you can pretend that you don't have the source code or the secrets).  Although you do not know the secret values, in practice,  it is not so difficult to find out  the memory address (the range or the exact value) of them (they are  in consecutive addresses), because for many operating systems, the addresses are exactly the same anytime you run the program.
+
+\begin{itemize}
+	\item Draw the layout of the stack frame corresponding to the main function directly after the local variables are initialized. For each element on the stack, provide its size (assuming a 32bit architecture).
+	\item Provide the specific inputs (i.e. both the integer and the string) that you need in order to crash the program. Explain why the program crashes with your input.
+	\item Provide the specific inputs (i.e. both the integer and the string) that you need in order to print the \emph{address} of the variable \verb"secret[0]". Explain why you think this is the correct address. Hint: you can use \verb"gdb" to verify that your answer is correct.
+	\item Provide the specific inputs (i.e. both the integer and the string) that you need in order to print the \emph{value} of \verb"secret[0]". Explain your strategy.
+	\item Based on your knowledge of how arrays are stored on the heap, calculate the address of \verb"secret[1]".
+	\item Provide the specific inputs (i.e. both the integer and the string) that you need in order to print the value of \verb"secret[1]". Explain your strategy.
+	\item Provide the specific inputs (i.e. both the integer and the string) that you need in order to modify the values of \emph{both} \verb"secret[0]" AND \verb"secret[1]". Explain your strategy.
+	\item Does address space randomization make this attack more difficult? Explain.
+	\item What other operating system defenses can be used to prevent this attack? Explain.
+\end{itemize}
+
+\end{document}
