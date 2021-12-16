@@ -1,7 +1,7 @@
 # 6324
 CS6324 Information Security Projects
 
-Project #1 - Encrypted File System
+Project #1 - A Encrypted File System
 
 Project #2 - Buffer Overflow, Return to libc, Format String Attacks
 
