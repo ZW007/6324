@@ -1,5 +1,5 @@
 # 6324
-CS6324 information security Projects
+CS6324 Information Security Projects
 
 Project #1 - Encrypted File System
 
